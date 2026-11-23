@@ -1,0 +1,48 @@
+test_automatic_on_and_off (test_backend.SkillTests.test_automatic_on_and_off) ... ok
+test_busy_motor_rejects_new_cycle (test_backend.SkillTests.test_busy_motor_rejects_new_cycle) ... ok
+test_command_changes_only_desired_with_version (test_backend.SkillTests.test_command_changes_only_desired_with_version) ... ok
+test_commands_resolve_each_user (test_backend.SkillTests.test_commands_resolve_each_user) ... ok
+test_conflict_reloads_shadow_then_retries (test_backend.SkillTests.test_conflict_reloads_shadow_then_retries) ... ok
+test_conflicts_are_bounded (test_backend.SkillTests.test_conflicts_are_bounded) ... ok
+test_context_user_is_required (test_backend.SkillTests.test_context_user_is_required) ... ok
+test_help_stop_and_launch (test_backend.SkillTests.test_help_stop_and_launch) ... ok
+test_interval_command_is_versioned_and_queries_applied_value (test_backend.SkillTests.test_interval_command_is_versioned_and_queries_applied_value) ... ok
+test_interval_validation_does_not_write_invalid_values (test_backend.SkillTests.test_interval_validation_does_not_write_invalid_values) ... ok
+test_invalid_name_is_rejected (test_backend.SkillTests.test_invalid_name_is_rejected) ... ok
+test_link_checks_existence_and_persists (test_backend.SkillTests.test_link_checks_existence_and_persists) ... ok
+test_low_level_only_warns_and_voice_still_works (test_backend.SkillTests.test_low_level_only_warns_and_voice_still_works) ... ok
+test_missing_shadow_can_receive_first_command (test_backend.SkillTests.test_missing_shadow_can_receive_first_command) ... ok
+test_motor_state_and_automatic_queries (test_backend.SkillTests.test_motor_state_and_automatic_queries) ... ok
+test_new_queries_require_recent_valid_data (test_backend.SkillTests.test_new_queries_require_recent_valid_data) ... ok
+test_nonexistent_thing_does_not_replace_binding (test_backend.SkillTests.test_nonexistent_thing_does_not_replace_binding) ... ok
+test_other_skill_is_rejected_before_database (test_backend.SkillTests.test_other_skill_is_rejected_before_database) ... ok
+test_pending_command_is_not_overwritten (test_backend.SkillTests.test_pending_command_is_not_overwritten) ... ok
+test_repeated_request_does_not_send_again (test_backend.SkillTests.test_repeated_request_does_not_send_again) ... ok
+test_sensor_reads_reported_not_desired (test_backend.SkillTests.test_sensor_reads_reported_not_desired) ... ok
+test_slot_synonym_uses_canonical_name (test_backend.SkillTests.test_slot_synonym_uses_canonical_name) ... ok
+test_stale_data_not_presented_as_current (test_backend.SkillTests.test_stale_data_not_presented_as_current) ... ok
+test_unlink_uses_current_user (test_backend.SkillTests.test_unlink_uses_current_user) ... ok
+test_unlinked_user_is_guided_without_iot_call (test_backend.SkillTests.test_unlinked_user_is_guided_without_iot_call) ... ok
+test_warmup_explained (test_backend.SkillTests.test_warmup_explained) ... ok
+test_clock_errors_are_visible (test_evidence.EvidenceTests.test_clock_errors_are_visible) ... ok
+test_empty_window_has_no_invented_success_rate (test_evidence.EvidenceTests.test_empty_window_has_no_invented_success_rate) ... ok
+test_integrity_uses_intersection_not_all_rows_in_export (test_evidence.EvidenceTests.test_integrity_uses_intersection_not_all_rows_in_export) ... ok
+test_multiple_things_are_rejected (test_evidence.EvidenceTests.test_multiple_things_are_rejected) ... ok
+test_only_completed_cycles_count_and_keep_origin (test_evidence.EvidenceTests.test_only_completed_cycles_count_and_keep_origin) ... ok
+test_visibility_latency_uses_observation_after_query (test_evidence.EvidenceTests.test_visibility_latency_uses_observation_after_query) ... ok
+test_visibility_polling_is_bounded (test_evidence.EvidenceTests.test_visibility_polling_is_bounded) ... ok
+test_visibility_rejects_future_publication_clock (test_evidence.EvidenceTests.test_visibility_rejects_future_publication_clock) ... ok
+test_bad_types_ranges_and_inconsistent_states_are_discarded (test_storage.StorageTests.test_bad_types_ranges_and_inconsistent_states_are_discarded) ... ok
+test_duplicate_is_successful_no_second_record (test_storage.StorageTests.test_duplicate_is_successful_no_second_record) ... ok
+test_led_event_cannot_claim_voice_origin (test_storage.StorageTests.test_led_event_cannot_claim_voice_origin) ... ok
+test_malformed_envelopes_never_write (test_storage.StorageTests.test_malformed_envelopes_never_write) ... ok
+test_same_message_on_two_things_has_separate_partition (test_storage.StorageTests.test_same_message_on_two_things_has_separate_partition) ... ok
+test_servo_event_retains_voice_origin (test_storage.StorageTests.test_servo_event_retains_voice_origin) ... ok
+test_transient_database_errors_are_retried_by_lambda (test_storage.StorageTests.test_transient_database_errors_are_retried_by_lambda) ... ok
+test_unknown_clock_is_explicit_and_key_stays_stable (test_storage.StorageTests.test_unknown_clock_is_explicit_and_key_stays_stable) ... ok
+test_valid_reading_enriches_without_mutating_input (test_storage.StorageTests.test_valid_reading_enriches_without_mutating_input) ... ok
+
+----------------------------------------------------------------------
+Ran 43 tests in 0.008s
+
+OK

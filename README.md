@@ -1,46 +1,48 @@
-# Ambientador inteligente — Práctica 3
+# Ambientador inteligente — Práctica 4
 
-Ambientador controlado por una skill personalizada de Alexa, con ESP32, PIR HC-SR501 y servomotor SG90 de 180°. Alexa usa una Lambda Python que modifica el Shadow clásico; el ESP32 se conecta mediante MQTT/TLS. DynamoDB conserva la vinculación de cada usuario con su propio Thing.
+Extensión del proyecto de la Práctica 3: ESP32 DOIT DEVKIT V1, PIR HC-SR501 y servo SG90, con **XKC-Y23A-NPN** y **RGB de cátodo común**. El LED se muestra verde con líquido a la altura del sensor y anaranjado con nivel bajo. **El aviso nunca bloquea la dosificación automática ni por voz.**
 
-## Archivos principales
+El sensor de líquido usa GPIO26 con **pull-up interno del ESP32 (`INPUT_PULLUP`)**, sin resistencia externa de señal. Se mantienen las resistencias del RGB. Ver conexiones y comprobaciones eléctricas en [configuración](docs/practica4/configuracion.md).
 
-- [Firmware PlatformIO](firmware/src/main.cpp): una clase `Ambientador`, sensor, servo, Shadow y reconexión.
-- [Lambda Python](backend/lambda_function.py): una clase `AmbientadorSkill`, vinculación, consultas y comandos.
-- [Modelo de Alexa es-ES](alexa/interaction-model.es-ES.json), importable desde JSON Editor.
-- [Configuración y montaje](docs/configuracion.md): datos del despliegue, conexiones y configuración de AWS y Alexa.
-- [Informe técnico](docs/informe.md): las ocho secciones exigidas, contrato Shadow, diagramas y resultados.
-- [Plan de pruebas](docs/pruebas.md): criterios medibles, procedimientos y registro de evidencias.
-- [Guía de defensa](docs/defensa.md): decisiones, límites y recorrido de demostración.
-- [Configuraciones AWS](infra/): tabla, políticas y ejemplos de Shadow.
+Alexa conserva la vinculación de cada usuario con su Thing. Todos los comandos pasan por el Shadow. El ESP32 ejecuta las reglas locales y una nueva Lambda valida y registra lecturas y cambios de actuadores en DynamoDB, con origen e identificadores para deduplicación.
 
-## Comportamiento
+## Documentación vigente
 
-1. Abrir «ambientador inteligente» y decir «vincula mi ambientador con thing».
-2. «Activa el ambientador»: solicita un ciclo 0° → 180° → 0° (700 ms por fase).
-3. «Activa el modo automático»: permite un ciclo ante un nuevo flanco de movimiento del PIR, con separación mínima de 5 s (configuración de pruebas) desde el último ciclo. Requiere conexión y sincronización con el Shadow.
-4. «Desactiva el modo automático»: impide nuevos ciclos por PIR; deja terminar el ciclo en curso.
-5. «Hay movimiento», «cuál es el estado del motor» y «está activado el modo automático» consultan `reported`.
-6. «Cambia mi ambientador a ambientador dos» reemplaza la vinculación, si ese Thing existe y está autorizado; «desvincula mi ambientador» la elimina.
+- [Guía de estudio y decisiones](docs/practica4/guia.md): recorrido del código, alcance, reglas y limitaciones.
+- [Diseño y diagramas](docs/practica4/diseno.md): bloques, circuito, clases, arquitectura, estados y secuencias.
+- [Contratos de datos y Alexa](docs/practica4/contratos.md): Shadow, regla SQL, histórico, intents y consultas.
+- [Montaje y despliegue](docs/practica4/configuracion.md): conexiones, preparación local y configuración AWS/Alexa.
+- [Costos y seguridad](docs/practica4/costos-seguridad.md): consumo reproducible y condición de capa gratuita.
+- [Pruebas fundamentales y trazabilidad](docs/practica4/pruebas.md): seis pruebas manuales integradas, métricas y rúbrica.
+- [Mockups de reportes](docs/practica4/reportes.html): abrir en un navegador; datos ficticios y sin conexión a AWS.
+- [Estado verificable](evidencias/practica4/estado.md): comprobaciones locales y pendientes reales.
 
-El modo automático es una extensión solicitada por el usuario. Arranca desactivado y se recupera el valor deseado al conectar. La dosificación se calibra acoplando el mecanismo al pulsador.
+El [informe de la Práctica 3](docs/informe.md), sus guías y evidencias permanecen como antecedentes; no describen la versión actual. **Todavía no se genera el informe final de la Práctica 4.**
+
+**Estado AWS al 23 de noviembre de 2026:** histórico desplegado y regla habilitada en `us-east-2`; Lambda Alexa actualizada. Recorrido Shadow → IoT Rule → Lambda → DynamoDB verificado con datos sintéticos separados. Falta cargar la placa, actualizar el modelo en Alexa Developer Console y ejecutar las pruebas físicas. Consultar [evidencia y pendientes](evidencias/practica4/aws-integracion-2026-11-23.md).
+
+## Uso
+
+1. Vincular: «vincula mi ambientador con thing».
+2. Dosificar: «activa el ambientador»; ciclo 0° → 180° → 0°, 700 ms por fase.
+3. Control local: «activa el modo automático». Un nuevo flanco PIR dispara una dosis si el motor está libre y transcurrió el intervalo; no dosifica repetidamente por mantener el PIR alto.
+4. Configurar: «cambia el intervalo a trescientos segundos»; valores enteros de 5 a 86400 s. El valor inicial es 300 s.
+5. Consultar: «hay movimiento», «cuál es el nivel de fragancia», «de qué color está el led», «cuál es el estado del motor», «cuál es el modo actual» y «cuál es el intervalo».
+6. «Desactiva el modo automático» impide nuevos ciclos PIR y deja terminar el actual. La voz sigue permitida con motor libre y puede saltarse el intervalo automático.
 
 ## Verificación local
 
-Desde la raíz, con Python y PlatformIO instalados:
-
 ```powershell
-python -m pip install -r backend/requirements-dev.txt platformio
-python -B -m unittest discover -s tests -v
-Copy-Item firmware/include/secrets.example.h firmware/include/secrets.h
-python -m platformio run -d firmware
+python -m venv .venv
+./.venv/Scripts/python.exe -m pip install -r backend/requirements-dev.txt platformio
+./.venv/Scripts/python.exe -B -m unittest discover -s tests -v
+./.venv/Scripts/python.exe -m ruff check backend scripts tests
+./.venv/Scripts/python.exe -m platformio run -d firmware
+./.venv/Scripts/python.exe scripts/prepare_deployment.py
+./.venv/Scripts/cfn-lint.exe .local/deployment/practica4-stack.json
+./.venv/Scripts/python.exe scripts/estimate_usage.py
 ```
 
-No sobrescribir un `secrets.h` ya configurado. La plantilla permite compilar pero no conectarse. En esta carpeta se preparó también `.venv`; se puede sustituir `python` por `.\.venv\Scripts\python.exe`.
+Si no existe `firmware/include/secrets.h`, copiar `secrets.example.h` a ese nombre y completar localmente. **Nunca sobrescribir un archivo de secretos existente ni publicarlo.** No subir firmware compilado: contiene las credenciales incorporadas.
 
-## Estado de entrega
-
-Proyecto desplegado y en operación. Placa confirmada: DOIT ESP32 DEVKIT V1 (`esp32doit-devkit-v1`). Región `us-east-2`, cuenta, endpoint IoT ATS e ID de skill configurados. Lambda `Alexa`, ARN `arn:aws:lambda:us-east-2:679937333206:function:Alexa`, con permiso de logs y disparador Alexa Skills Kit. Infraestructura desplegada en AWS y vinculación Lambda–DynamoDB verificada. La skill responde en el simulador de Alexa Developer Console y el dispositivo intercambia estado por el Shadow.
-
-Resultados registrados: 22/22 pruebas del backend, compilación correcta del firmware y ciclo de servo observado. [EP01](evidencias/ejecucion-prolongada.md) reúne 11 ciclos completos con `reported` aceptado por AWS en una ventana de 15 min 42,995 s, y [AL01](evidencias/pruebas-alexa-vivo.md) las capturas del simulador. El detalle de pruebas y resultados está en [docs/pruebas.md](docs/pruebas.md) y en el [informe](docs/informe.md).
-
-Cada integrante aporta sus propios commits; la publicación en GitHub y el envío del enlace al LMS corresponden al grupo.
+La compilación no carga la placa. La preparación no despliega recursos ni actualiza Alexa. El sensor requiere un recipiente no metálico compatible con la fragancia: no atraviesa una lata de aerosol.

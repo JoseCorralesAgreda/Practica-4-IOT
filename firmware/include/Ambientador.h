@@ -5,6 +5,8 @@
 #include <Preferences.h>
 #include <PubSubClient.h>
 #include <WiFiClientSecure.h>
+#include "LevelIndicator.h"
+#include "TelemetryQueue.h"
 
 class Ambientador {
  public:
@@ -17,6 +19,10 @@ class Ambientador {
   PubSubClient mqtt;
   Servo servo;
   Preferences preferences;
+  LevelIndicator level;
+  TelemetryQueue telemetry;
+  const char* cycleOrigin = "edge";
+  uint32_t cooldownSeconds = 300;
   String topic;
   String lastActivation;
   String phase = "idle";
@@ -33,7 +39,6 @@ class Ambientador {
   uint32_t lastGet = 0;
   uint32_t lastReport = 0;
   uint32_t lastPirLog = 0;
-  uint32_t lastPublish = 0;
   uint32_t phaseStarted = 0;
   uint32_t lastCycle = 0;
   uint32_t lastVersion = 0;
@@ -45,7 +50,9 @@ class Ambientador {
   void onMessage(const String& name, byte* payload, unsigned int length);
   void applyDesired(JsonVariantConst desired);
   void updateSensor(uint32_t now);
-  void startCycle(uint32_t now);
+  void startCycle(uint32_t now, const char* origin);
   void updateServo(uint32_t now);
   void report(uint32_t now);
+  void capture(const char* actuator = nullptr, const char* from = nullptr,
+               const char* to = nullptr, const char* origin = "edge");
 };

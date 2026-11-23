@@ -1,5 +1,5 @@
 """Pruebas del contrato Alexa/AWS sin red ni credenciales reales."""
-import copy
+
 import io
 import json
 import time
@@ -7,6 +7,7 @@ import unittest
 from unittest.mock import Mock
 
 from botocore.exceptions import ClientError
+
 from backend.lambda_function import AmbientadorSkill
 
 
@@ -19,18 +20,35 @@ class SkillTests(unittest.TestCase):
         self.table, self.iot, self.shadow = Mock(), Mock(), Mock()
         self.skill = AmbientadorSkill(self.table, self.iot, self.shadow, "skill-test")
         self.table.get_item.return_value = {"Item": {"thingName": "thing"}}
-        self.document = {"version": 7, "state": {"reported": {
-            "sampledAt": int(time.time()), "presence": True, "pirReady": True,
-            "automatic": False, "servoState": "idle", "activationId": "anterior",
-        }, "desired": {"activationId": "anterior"}}}
+        self.document = {
+            "version": 7,
+            "state": {
+                "reported": {
+                    "sampledAt": int(time.time()),
+                    "presence": True,
+                    "pirReady": True,
+                    "automatic": False,
+                    "servoState": "idle",
+                    "activationId": "anterior",
+                },
+                "desired": {"activationId": "anterior"},
+            },
+        }
         self.shadow.get_thing_shadow.side_effect = lambda **kwargs: {
-            "payload": io.BytesIO(json.dumps(self.document).encode())}
+            "payload": io.BytesIO(json.dumps(self.document).encode())
+        }
 
     def event(self, name, user="usuario-uno", slots=None):
-        return {"context": {"System": {"application": {"applicationId": "skill-test"},
-                                         "user": {"userId": user}}},
-                "request": {"type": "IntentRequest", "requestId": "peticion-001",
-                            "intent": {"name": name, "slots": slots or {}}}}
+        return {
+            "context": {
+                "System": {"application": {"applicationId": "skill-test"}, "user": {"userId": user}}
+            },
+            "request": {
+                "type": "IntentRequest",
+                "requestId": "peticion-001",
+                "intent": {"name": name, "slots": slots or {}},
+            },
+        }
 
     def speech(self, event):
         return self.skill.handle(event)["response"]["outputSpeech"]["text"]
@@ -50,7 +68,10 @@ class SkillTests(unittest.TestCase):
 
     def test_nonexistent_thing_does_not_replace_binding(self):
         self.iot.describe_thing.side_effect = aws_error("ResourceNotFoundException")
-        self.assertIn("no existe", self.speech(self.event("VincularIntent", slots={"thingName": {"value": "missing"}})))
+        self.assertIn(
+            "no existe",
+            self.speech(self.event("VincularIntent", slots={"thingName": {"value": "missing"}})),
+        )
         self.table.put_item.assert_not_called()
 
     def test_invalid_name_is_rejected(self):
@@ -58,8 +79,17 @@ class SkillTests(unittest.TestCase):
         self.iot.describe_thing.assert_not_called()
 
     def test_slot_synonym_uses_canonical_name(self):
-        slot = {"value": "ambientador dos", "resolutions": {"resolutionsPerAuthority": [{
-            "status": {"code": "ER_SUCCESS_MATCH"}, "values": [{"value": {"name": "ambientador-dos"}}]}]}}
+        slot = {
+            "value": "ambientador dos",
+            "resolutions": {
+                "resolutionsPerAuthority": [
+                    {
+                        "status": {"code": "ER_SUCCESS_MATCH"},
+                        "values": [{"value": {"name": "ambientador-dos"}}],
+                    }
+                ]
+            },
+        }
         self.speech(self.event("VincularIntent", slots={"thingName": slot}))
         self.iot.describe_thing.assert_called_with(thingName="ambientador-dos")
 
@@ -68,17 +98,26 @@ class SkillTests(unittest.TestCase):
         self.table.delete_item.assert_called_once_with(Key={"userId": "usuario-dos"})
 
     def test_commands_resolve_each_user(self):
-        self.table.get_item.side_effect = [{"Item": {"thingName": "thing"}}, {"Item": {"thingName": "ambientador-dos"}}]
+        self.table.get_item.side_effect = [
+            {"Item": {"thingName": "thing"}},
+            {"Item": {"thingName": "ambientador-dos"}},
+        ]
         for user in ("usuario-uno", "usuario-dos"):
             self.speech(self.event("ActivarIntent", user=user))
-        names = [call.kwargs["thingName"] for call in self.shadow.update_thing_shadow.call_args_list]
+        names = [
+            call.kwargs["thingName"] for call in self.shadow.update_thing_shadow.call_args_list
+        ]
         self.assertEqual(names, ["thing", "ambientador-dos"])
-        self.assertTrue(all(call.kwargs["ConsistentRead"] for call in self.table.get_item.call_args_list))
+        self.assertTrue(
+            all(call.kwargs["ConsistentRead"] for call in self.table.get_item.call_args_list)
+        )
 
     def test_command_changes_only_desired_with_version(self):
         self.assertIn("Envié", self.speech(self.event("ActivarIntent")))
         payload = json.loads(self.shadow.update_thing_shadow.call_args.kwargs["payload"])
-        self.assertEqual(payload, {"version": 7, "state": {"desired": {"activationId": "peticion-001"}}})
+        self.assertEqual(
+            payload, {"version": 7, "state": {"desired": {"activationId": "peticion-001"}}}
+        )
 
     def test_repeated_request_does_not_send_again(self):
         self.document["state"]["desired"]["activationId"] = "peticion-001"
@@ -96,7 +135,10 @@ class SkillTests(unittest.TestCase):
         self.shadow.update_thing_shadow.assert_not_called()
 
     def test_automatic_on_and_off(self):
-        for name, expected in [("ActivarAutomaticoIntent", True), ("DesactivarAutomaticoIntent", False)]:
+        for name, expected in [
+            ("ActivarAutomaticoIntent", True),
+            ("DesactivarAutomaticoIntent", False),
+        ]:
             self.speech(self.event(name))
             payload = json.loads(self.shadow.update_thing_shadow.call_args.kwargs["payload"])
             self.assertEqual(payload["state"], {"desired": {"automatic": expected}})
@@ -123,7 +165,7 @@ class SkillTests(unittest.TestCase):
         self.shadow.update_thing_shadow.assert_not_called()
 
     def test_stale_data_not_presented_as_current(self):
-        self.document["state"]["reported"]["sampledAt"] -= 60
+        self.document["state"]["reported"]["sampledAt"] -= 181
         for name in ("ConsultarSensorIntent", "ConsultarMotorIntent", "ConsultarAutomaticoIntent"):
             self.assertIn("datos recientes", self.speech(self.event(name)))
 
@@ -155,6 +197,34 @@ class SkillTests(unittest.TestCase):
         event = self.event("unused")
         event["request"]["type"] = "LaunchRequest"
         self.assertIn("activar", self.speech(event))
+
+    def test_interval_validation_does_not_write_invalid_values(self):
+        for value in ("4", "86401", "2.5", "-5", "true", ""):
+            with self.subTest(value=value):
+                self.speech(
+                    self.event("CambiarIntervaloIntent", slots={"segundos": {"value": value}})
+                )
+        self.shadow.update_thing_shadow.assert_not_called()
+
+    def test_interval_command_is_versioned_and_queries_applied_value(self):
+        self.speech(self.event("CambiarIntervaloIntent", slots={"segundos": {"value": "300"}}))
+        payload = json.loads(self.shadow.update_thing_shadow.call_args.kwargs["payload"])
+        self.assertEqual(payload, {"version": 7, "state": {"desired": {"cooldownSeconds": 300}}})
+        self.document["state"]["reported"]["cooldownSeconds"] = 60
+        self.assertIn("60 segundos", self.speech(self.event("ConsultarIntervaloIntent")))
+
+    def test_low_level_only_warns_and_voice_still_works(self):
+        self.document["state"]["reported"].update(levelReady=True, lowLevel=True, ledColor="orange")
+        self.assertIn("no bloquea", self.speech(self.event("ConsultarNivelIntent")))
+        self.assertIn("anaranjado", self.speech(self.event("ConsultarLedIntent")))
+        self.assertIn("Envié", self.speech(self.event("ActivarIntent")))
+        self.shadow.update_thing_shadow.assert_called_once()
+
+    def test_new_queries_require_recent_valid_data(self):
+        self.assertIn("lectura válida", self.speech(self.event("ConsultarNivelIntent")))
+        self.document["state"]["reported"]["sampledAt"] -= 181
+        for name in ("ConsultarNivelIntent", "ConsultarLedIntent", "ConsultarIntervaloIntent"):
+            self.assertIn("datos recientes", self.speech(self.event(name)))
 
 
 if __name__ == "__main__":

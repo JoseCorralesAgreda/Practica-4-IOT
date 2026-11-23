@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ambientador · Mockups de reportes</title>
+  <style>
+    :root { color-scheme: light; font-family: system-ui, sans-serif; color: #16312d; background: #edf2ee; }
+    body { max-width: 1080px; margin: 0 auto; padding: 32px 20px; }
+    h1 { font-size: clamp(1.8rem, 4vw, 2.7rem); margin: 8px 0; }
+    h2 { margin-top: 0; } h3 { font-size: 1rem; }
+    .eyebrow { text-transform: uppercase; letter-spacing: .12em; font-size: .8rem; }
+    .notice { border-left: 4px solid #d87c14; background: #fff1da; padding: 16px; }
+    .filters { display: flex; flex-wrap: wrap; gap: 12px; margin: 24px 0; }
+    .filters span { border: 1px solid #acc1b8; border-radius: 6px; padding: 8px 12px; }
+    section { background: white; border-radius: 14px; padding: 24px; margin: 24px 0; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; }
+    .card { background: #f1f5f2; border-radius: 8px; padding: 18px; }
+    .value { display: block; font-size: 2rem; font-weight: 700; margin: 6px 0; }
+    .low { background: #fff0dc; color: #7c4406; }
+    .bars { display: flex; align-items: end; gap: 30px; height: 150px; padding: 12px; border-bottom: 1px solid #9cac9f; }
+    .bar { background: #277262; color: white; text-align: center; width: 38%; min-width: 90px; padding-top: 8px; }
+    .bar.voice { background: #596a8c; }
+    table { width: 100%; border-collapse: collapse; text-align: left; }
+    td, th { padding: 12px 8px; border-bottom: 1px solid #dde4df; }
+    .scroll { overflow-x: auto; } .muted { color: #52665e; font-size: .9rem; }
+    code { overflow-wrap: anywhere; } a { color: #176152; }
+    @media print { body { background: white; padding: 0; } section { break-inside: avoid; border: 1px solid #ddd; } }
+  </style>
+</head>
+<body>
+  <header>
+    <p class="eyebrow">Ambientador inteligente · Diseño de reportes</p>
+    <h1>Reposición y uso de fragancia</h1>
+    <p class="notice"><strong>Mockup con datos ficticios.</strong> No consulta AWS y no constituye evidencia del prototipo. Los filtros son ilustrativos.</p>
+    <div class="filters"><span>Thing: ambientador-demo</span><span>Fecha: 21/11/2026</span><span>Zona horaria: America/La_Paz</span></div>
+  </header>
+  <main>
+    <section aria-labelledby="nivel-title">
+      <p class="eyebrow">Reporte 01 · Decidir cuándo reponer</p>
+      <h2 id="nivel-title">Estado y avisos de nivel</h2>
+      <div class="grid">
+        <article class="card low"><h3>Última lectura</h3><span class="value">Nivel bajo</span><p>LED anaranjado · reponer fragancia</p></article>
+        <article class="card"><h3>Antigüedad</h3><span class="value">42 s</span><p>Dato reciente, no un porcentaje de volumen</p></article>
+        <article class="card"><h3>Descensos detectados hoy</h3><span class="value">2</span><p>Transiciones verde → anaranjado</p></article>
+      </div>
+      <h3>Cronología ilustrativa</h3>
+      <div class="scroll"><table><thead><tr><th>Hora local</th><th>Evento</th><th>Interpretación</th></tr></thead><tbody>
+        <tr><td>09:10</td><td>Verde → anaranjado</td><td>Líquido por debajo de la altura del sensor</td></tr>
+        <tr><td>09:25</td><td>Anaranjado → verde</td><td>Volvió a detectarse líquido; posible reposición</td></tr>
+        <tr><td>16:40</td><td>Verde → anaranjado</td><td>Nuevo aviso; la dosificación sigue habilitada</td></tr>
+      </tbody></table></div>
+      <p class="muted">Origen: Query por Thing y rango de recordKey; eventos RGB. Último registro válido con clockKnown y levelReady. Excluir TTL vencido; si la antigüedad supera 180 s mostrar “Sin datos recientes”. Un arranque apagado → anaranjado se presenta aparte.</p>
+    </section>
+    <section aria-labelledby="uso-title">
+      <p class="eyebrow">Reporte 02 · Revisar el intervalo automático</p>
+      <h2 id="uso-title">Ciclos terminados por origen</h2>
+      <div class="grid">
+        <article class="card"><h3>Total ilustrativo</h3><span class="value">12</span><p>Ciclos completados; no mililitros consumidos</p></article>
+        <article class="card"><h3>Intervalo reportado</h3><span class="value">300 s</span><p>Configuración aplicada más reciente</p></article>
+        <article class="card"><h3>Modo reportado</h3><span class="value">Automático</span><p>La voz también puede iniciar ciclos</p></article>
+      </div>
+      <div class="bars" role="img" aria-label="Datos ficticios: 8 ciclos Edge y 4 ciclos por voz"><div class="bar" style="height: 112px">8 · Edge</div><div class="bar voice" style="height: 56px">4 · Voz</div></div>
+      <p><strong>Decisión posible:</strong> si las activaciones automáticas resultan excesivas, aumentar el intervalo por voz y comparar otra sesión equivalente.</p>
+      <p class="muted">Origen: Query por Thing y día, convertir límites locales a UTC; contar eventos servo con to=idle y agrupar origin. No sumar el contador acumulativo cyclesSinceBoot ni contar cada fase como una dosis. El intervalo y el modo proceden del último registro no vencido.</p>
+    </section>
+    <section>
+      <h2>Calidad de los datos antes de decidir</h2>
+      <p>Mostrar huecos, registros sin hora, descartes de cola y antigüedad. Un descenso no prueba cuánto líquido se consumió; la vuelta a verde no demuestra por sí sola una reposición. El servo no confirma la cantidad atomizada.</p>
+      <p>Un día se consulta con PK exacta y SK entre marcas de tiempo; las páginas se recorren completamente. El diseño no exige Scan ni índices extra. Consulta detallada en <a href="contratos.md">contratos y patrones de acceso</a>.</p>
+    </section>
+  </main>
+</body>
+</html>

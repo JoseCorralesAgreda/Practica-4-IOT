@@ -17,8 +17,7 @@ constexpr int REST_ANGLE = 0;
 constexpr int PRESS_ANGLE = 180;
 constexpr uint32_t SERVO_PHASE_MS = 700;
 constexpr uint32_t PIR_WARMUP_MS = 60000;
-constexpr uint32_t AUTO_COOLDOWN_MS = 5000; // Intervalo reducido para pruebas.
-constexpr uint32_t REPORT_MS = 15000;
+constexpr uint32_t REPORT_MS = 60000;
 constexpr uint32_t RETRY_MS = 5000;
 
 Ambientador::Ambientador() : mqtt(tls) {}
@@ -30,9 +29,14 @@ void Ambientador::begin() {
     digitalWrite(STATUS_LED_PIN, LOW);
     storageReady = preferences.begin("ambientador", false);
     lastActivation = preferences.getString("activation", "");
+    automatic = preferences.getBool("automatic", false);
+    cooldownSeconds = preferences.getUInt("cooldown", 300);
+    if (cooldownSeconds < 5 || cooldownSeconds > 86400) cooldownSeconds = 300;
+    telemetry.begin();
     servo.setPeriodHertz(50);
     servo.attach(SERVO_PIN, 500, 2400);
     servo.write(REST_ANGLE);
+    level.begin();
     Serial.printf("Servo: angulo ordenado=%d grados (reposo); LED apagado\n", REST_ANGLE);
     topic = String("$aws/things/") + THING_NAME + "/shadow";
     tls.setCACert(ROOT_CA);
@@ -55,15 +59,18 @@ void Ambientador::begin() {
 void Ambientador::tick() {
     uint32_t now = millis();
     updateServo(now);
+    const String previousColor = level.color();
+    if (level.update(now)) capture("rgb", previousColor.c_str(), level.color());
     updateSensor(now);
+    if ((dirty && now - lastReport >= 2000) || now - lastReport >= REPORT_MS) report(now);
     // No iniciar conexiones TLS bloqueantes durante un ciclo mecánico.
     if (phase == "idle") connect(now);
-    if (mqtt.connected()) {
+    // Durante el ciclo, evitar también lecturas MQTT potencialmente bloqueantes.
+    if (mqtt.connected() && phase == "idle") {
       mqtt.loop();
       if (!synchronized && now - lastGet >= RETRY_MS) requestShadow();
-      if (synchronized && (dirty || now - lastReport >= REPORT_MS) && now - lastPublish >= 200) {
-        report(now);
-      }
+      // Un callback MQTT puede haber iniciado un ciclo durante loop().
+      if (synchronized && phase == "idle") telemetry.publish(mqtt, topic, now);
     }
     delay(5);
   }
@@ -125,6 +132,7 @@ void Ambientador::onMessage(const String& name, byte* payload, unsigned int leng
       return;
     }
     if (name.endsWith("/update/accepted")) {
+      telemetry.acknowledge(document["clientToken"] | "");
       if (document["state"]["reported"].is<JsonObject>()) {
         Serial.println("Shadow: actualizacion de reported aceptada por AWS.");
       }
@@ -145,8 +153,19 @@ void Ambientador::onMessage(const String& name, byte* payload, unsigned int leng
 
 void Ambientador::applyDesired(JsonVariantConst desired) {
     if (desired["automatic"].is<bool>()) {
-      automatic = desired["automatic"].as<bool>();
-      dirty = true;
+      const bool requested = desired["automatic"].as<bool>();
+      if (requested != automatic && storageReady && preferences.putBool("automatic", requested)) {
+        automatic = requested;
+        dirty = true;
+      }
+    }
+    if (desired["cooldownSeconds"].is<uint32_t>()) {
+      const uint32_t requested = desired["cooldownSeconds"].as<uint32_t>();
+      if (requested >= 5 && requested <= 86400 && requested != cooldownSeconds &&
+          storageReady && preferences.putUInt("cooldown", requested)) {
+        cooldownSeconds = requested;
+        dirty = true;
+      }
     }
     if (!desired["activationId"].is<const char*>()) return;
     String id = desired["activationId"].as<String>();
@@ -161,7 +180,7 @@ void Ambientador::applyDesired(JsonVariantConst desired) {
       return;
     }
     lastActivation = id;
-    startCycle(millis());
+    startCycle(millis(), "voz");
   }
 
 void Ambientador::updateSensor(uint32_t now) {
@@ -187,17 +206,19 @@ void Ambientador::updateSensor(uint32_t now) {
     if (reading == presence) return;
     presence = reading;
     dirty = true;
-    bool cooldownElapsed = !activatedBefore || now - lastCycle >= AUTO_COOLDOWN_MS;
-    if (presence && automatic && synchronized && mqtt.connected() && phase == "idle" && cooldownElapsed) {
-      startCycle(now);
+    bool cooldownElapsed = !activatedBefore || now - lastCycle >= cooldownSeconds * 1000UL;
+    if (presence && automatic && phase == "idle" && cooldownElapsed) {
+      startCycle(now, "edge");
     }
   }
 
-void Ambientador::startCycle(uint32_t now) {
+void Ambientador::startCycle(uint32_t now, const char* origin) {
+    cycleOrigin = origin;
     digitalWrite(STATUS_LED_PIN, HIGH);
     servo.write(PRESS_ANGLE);
     Serial.printf("Servo: angulo ordenado=%d grados (presion); LED encendido\n", PRESS_ANGLE);
     phase = "pressing";
+    capture("servo", "idle", "pressing", cycleOrigin);
     phaseStarted = now;
     lastCycle = now;
     activatedBefore = true;
@@ -212,39 +233,48 @@ void Ambientador::updateServo(uint32_t now) {
       servo.write(REST_ANGLE);
       Serial.printf("Servo: angulo ordenado=%d grados (retorno); LED encendido\n", REST_ANGLE);
       phase = "returning";
+      capture("servo", "pressing", "returning", cycleOrigin);
     } else {
       digitalWrite(STATUS_LED_PIN, LOW);
       phase = "idle";
       Serial.printf("Servo: ciclo terminado, angulo ordenado=%d grados; LED apagado\n", REST_ANGLE);
       cycles++;
+      capture("servo", "returning", "idle", cycleOrigin);
       if (mqtt.connected()) requestShadow();
     }
     dirty = true;
   }
 
 void Ambientador::report(uint32_t now) {
-    StaticJsonDocument<1024> document;
-    JsonObject reported = document.createNestedObject("state").createNestedObject("reported");
+    capture();
+    lastReport = now;
+    dirty = false;
+  }
+
+void Ambientador::capture(const char* actuator, const char* from, const char* to, const char* origin) {
+    StaticJsonDocument<2048> document;
+    JsonObject reported = document.to<JsonObject>();
     reported["presence"] = presence;
     reported["pirReady"] = pirReady;
     reported["automatic"] = automatic;
+    reported["cooldownSeconds"] = cooldownSeconds;
+    reported["levelReady"] = level.ready();
+    reported["lowLevel"] = level.low();
+    reported["ledColor"] = level.color();
     reported["activationId"] = lastActivation;
     reported["servoState"] = phase;
     reported["servoAngle"] = phase == "pressing" ? PRESS_ANGLE : REST_ANGLE;
     reported["cyclesSinceBoot"] = cycles;
-    reported["uptimeSeconds"] = now / 1000;
-    reported["sampledAt"] = static_cast<uint32_t>(time(nullptr));
-    char payload[1024];
-    size_t length = serializeJson(document, payload, sizeof(payload));
-    lastPublish = now;
-    // QoS 0: el siguiente reporte periódico repara una publicación perdida.
-    // Con char* y tres argumentos, length se convierte en retained=true.
-    // Los topicos reservados del Shadow requieren RETAIN=false.
-    if (mqtt.publish((topic + "/update").c_str(),
-                     reinterpret_cast<const uint8_t*>(payload), length, false)) {
-      lastReport = now;
-      dirty = false;
-    } else {
-      Serial.printf("No se pudo enviar reported; estado MQTT: %d\n", mqtt.state());
+    reported["uptimeSeconds"] = millis() / 1000;
+    reported["sampledAt"] = TelemetryQueue::epochMs() / 1000;
+    reported["recordKind"] = actuator ? "event" : "reading";
+    reported["event"] = nullptr;  // Elimina el evento anterior del Shadow en una lectura.
+    if (actuator) {
+      JsonObject event = reported.createNestedObject("event");
+      event["actuator"] = actuator;
+      event["from"] = from;
+      event["to"] = to;
+      event["origin"] = origin;
     }
+    telemetry.push(reported);
   }

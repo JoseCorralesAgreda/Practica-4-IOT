@@ -11,3 +11,7 @@ firmware/include/secrets.h
 .env.*
 !.env.example
 .local/
+.aws/
+*.p12
+*.pfx
+.ruff_cache/

@@ -1,0 +1,79 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Practica 4: historico del ambientador. Preparar con scripts/prepare_deployment.py. Verificar Free Tier antes de crear.",
+  "Parameters": {
+    "EnableRule": {"Type": "String", "Default": "false", "AllowedValues": ["false", "true"], "Description": "Habilitar solo tras verificar elegibilidad y consumo gratuito."}
+  },
+  "Conditions": {"RuleDisabled": {"Fn::Equals": [{"Ref": "EnableRule"}, "false"]}},
+  "Resources": {
+    "HistoryTable": {
+      "Type": "AWS::DynamoDB::Table",
+      "DeletionPolicy": "Retain",
+      "UpdateReplacePolicy": "Retain",
+      "Properties": {
+        "BillingMode": "PROVISIONED", "TableClass": "STANDARD",
+        "AttributeDefinitions": [{"AttributeName": "thingName", "AttributeType": "S"}, {"AttributeName": "recordKey", "AttributeType": "S"}],
+        "KeySchema": [{"AttributeName": "thingName", "KeyType": "HASH"}, {"AttributeName": "recordKey", "KeyType": "RANGE"}],
+        "ProvisionedThroughput": {"ReadCapacityUnits": 1, "WriteCapacityUnits": 5},
+        "TimeToLiveSpecification": {"AttributeName": "expiresAt", "Enabled": true},
+        "Tags": [{"Key": "Project", "Value": "AmbientadorPractica4"}]
+      }
+    },
+    "StorageRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {"Version": "2012-10-17", "Statement": [{"Effect": "Allow", "Principal": {"Service": "lambda.amazonaws.com"}, "Action": "sts:AssumeRole"}]},
+        "Policies": [{"PolicyName": "StoreHistoryOnly", "PolicyDocument": {
+          "Version": "2012-10-17", "Statement": [
+            {"Effect": "Allow", "Action": "dynamodb:PutItem", "Resource": {"Fn::GetAtt": ["HistoryTable", "Arn"]}},
+            {"Effect": "Allow", "Action": ["logs:CreateLogStream", "logs:PutLogEvents"], "Resource": {"Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${AWS::StackName}-storage:*"}}
+          ]
+        }}]
+      }
+    },
+    "StorageLogs": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {"LogGroupName": {"Fn::Sub": "/aws/lambda/${AWS::StackName}-storage"}, "RetentionInDays": 7}
+    },
+    "StorageFunction": {
+      "Type": "AWS::Lambda::Function",
+      "DependsOn": "StorageLogs",
+      "Properties": {
+        "FunctionName": {"Fn::Sub": "${AWS::StackName}-storage"},
+        "Runtime": "python3.13", "Handler": "index.lambda_handler", "MemorySize": 128, "Timeout": 10,
+        "Role": {"Fn::GetAtt": ["StorageRole", "Arn"]},
+        "Environment": {"Variables": {"HISTORY_TABLE": {"Ref": "HistoryTable"}}},
+        "Code": {"ZipFile": "raise RuntimeError('Ejecutar scripts/prepare_deployment.py antes de desplegar')"}
+      }
+    },
+    "StorageRetryPolicy": {
+      "Type": "AWS::Lambda::EventInvokeConfig",
+      "Properties": {"FunctionName": {"Ref": "StorageFunction"}, "Qualifier": "$LATEST", "MaximumRetryAttempts": 2, "MaximumEventAgeInSeconds": 3600}
+    },
+    "AllowIoTInvoke": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:InvokeFunction", "FunctionName": {"Ref": "StorageFunction"},
+        "Principal": "iot.amazonaws.com", "SourceAccount": {"Ref": "AWS::AccountId"},
+        "SourceArn": {"Fn::Sub": "arn:${AWS::Partition}:iot:${AWS::Region}:${AWS::AccountId}:rule/ambientador_p4_history"}
+      }
+    },
+    "HistoryRule": {
+      "Type": "AWS::IoT::TopicRule",
+      "DependsOn": "AllowIoTInvoke",
+      "Properties": {
+        "RuleName": "ambientador_p4_history",
+        "TopicRulePayload": {
+          "AwsIotSqlVersion": "2016-03-23", "RuleDisabled": {"Fn::If": ["RuleDisabled", true, false]},
+          "Sql": "SELECT * FROM 'disabled/prepare_deployment_required'",
+          "Actions": [{"Lambda": {"FunctionArn": {"Fn::GetAtt": ["StorageFunction", "Arn"]}}}]
+        }
+      }
+    }
+  },
+  "Outputs": {
+    "HistoryTableName": {"Value": {"Ref": "HistoryTable"}},
+    "StorageFunctionName": {"Value": {"Ref": "StorageFunction"}},
+    "HistoryRuleName": {"Value": {"Ref": "HistoryRule"}}
+  }
+}

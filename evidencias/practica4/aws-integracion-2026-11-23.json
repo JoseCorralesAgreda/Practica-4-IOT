@@ -1,0 +1,87 @@
+{
+  "checkedAtUtc": "2026-11-23T17:09:17.968241+00:00",
+  "account": "679937333206",
+  "region": "us-east-2",
+  "stackStatus": "UPDATE_COMPLETE",
+  "outputs": {
+    "HistoryTableName": "ambientador-p4-HistoryTable-YBDZ42IAGZOK",
+    "StorageFunctionName": "ambientador-p4-storage",
+    "HistoryRuleName": "ambientador_p4_history"
+  },
+  "ruleEnabled": true,
+  "ruleSql": "SELECT state.reported AS reported, topic(3) AS thingName, timestamp() AS receivedAtMs\nFROM '$aws/things/+/shadow/update/accepted'\nWHERE state.reported.schemaVersion = 4\nAND clientToken = state.reported.messageId\n",
+  "tableStatus": "ACTIVE",
+  "capacity": {
+    "ReadCapacityUnits": 1,
+    "WriteCapacityUnits": 5
+  },
+  "ttl": {
+    "TimeToLiveStatus": "ENABLED",
+    "AttributeName": "expiresAt"
+  },
+  "functions": {
+    "Alexa": {
+      "Runtime": "python3.13",
+      "Handler": "lambda_function.lambda_handler",
+      "State": "Active",
+      "LastUpdateStatus": "Successful",
+      "CodeSha256": "NCclWH9uu14o+O9nGvBINL6vqKdu4exNHQYAkAaPUsY=",
+      "MemorySize": 128,
+      "Timeout": 8
+    },
+    "ambientador-p4-storage": {
+      "Runtime": "python3.13",
+      "Handler": "index.lambda_handler",
+      "State": "Active",
+      "LastUpdateStatus": "Successful",
+      "CodeSha256": "zXfV/cfqdFJlA+Ul19zm/KhtNpN6Smy+LhTmFQfjVSQ=",
+      "MemorySize": 128,
+      "Timeout": 10
+    }
+  },
+  "freeTierPlan": {
+    "accountId": "679937333206",
+    "accountPlanType": "FREE",
+    "accountPlanStatus": "ACTIVE",
+    "accountPlanRemainingCredits": {
+      "amount": 119.94,
+      "unit": "USD"
+    },
+    "accountPlanExpirationDate": "2027-05-07 21:32:10.160000+00:00"
+  },
+  "freeTierUsage": [],
+  "freeTierUsageNextTokenPresent": false,
+  "lambdaSmoke": {
+    "timestampUtc": "2026-11-23T17:05:51.845006+00:00",
+    "account": "679937333206",
+    "region": "us-east-2",
+    "synthetic": true,
+    "outputs": {
+      "HistoryTableName": "ambientador-p4-HistoryTable-YBDZ42IAGZOK",
+      "StorageFunctionName": "ambientador-p4-storage",
+      "HistoryRuleName": "ambientador_p4_history"
+    },
+    "storageValid": "stored",
+    "storageDuplicate": "duplicate",
+    "storageInvalid": {
+      "status": "discarded",
+      "reason": "presence"
+    },
+    "consistentRead": true,
+    "alexaCodeSha256Matches": true,
+    "alexaLaunch": "Bienvenido. Primero di: vincula mi ambientador con thing.",
+    "alexaUnlinked": "No tienes un objeto vinculado. Di: vincula mi ambientador con thing.",
+    "syntheticRowRemoved": true
+  },
+  "iotSmoke": {
+    "timestampUtc": "2026-11-23T17:07:34.640207+00:00",
+    "synthetic": true,
+    "physicalDeviceUsed": false,
+    "path": "Shadow update/accepted -> IoT Rule -> Lambda -> DynamoDB",
+    "ruleEnabled": true,
+    "stored": true,
+    "visibilityUpperBoundSeconds": 1.455,
+    "readAttempts": 1,
+    "syntheticShadowAndRowRemoved": true
+  }
+}

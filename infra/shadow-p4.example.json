@@ -1,0 +1,17 @@
+{
+  "state": {
+    "desired": {"automatic": true, "cooldownSeconds": 300, "activationId": "ejemplo-orden-1"},
+    "reported": {
+      "automatic": true, "cooldownSeconds": 300, "activationId": "ejemplo-orden-1",
+      "presence": false, "pirReady": true, "levelReady": true, "lowLevel": true,
+      "ledColor": "orange", "servoState": "idle", "servoAngle": 0,
+      "cyclesSinceBoot": 1, "uptimeSeconds": 120,
+      "schemaVersion": 4, "messageId": "p4-aaaaaaaaaaaaaaaaaaaaaaaa-1",
+      "sampledAt": 1800000000, "observedAtMs": 1800000000000,
+      "publishedAtMs": 1800000000100, "droppedRecords": 0,
+      "recordKind": "event",
+      "event": {"actuator": "servo", "from": "returning", "to": "idle", "origin": "voz"}
+    }
+  },
+  "clientToken": "p4-aaaaaaaaaaaaaaaaaaaaaaaa-1"
+}
