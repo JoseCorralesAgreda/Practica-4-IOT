@@ -20,7 +20,7 @@ Espressif documenta un pull-up interno de aproximadamente 45 kΩ ([GPIO Arduino-
 
 Fijar el sensor externamente a la altura mínima deseada en un recipiente no metálico; probar con la fragancia real. Este umbral es **físico**, no un número de porcentaje que pueda cambiarse por voz. El parámetro de negocio configurable por voz es el intervalo de dosificación. Ensayar vacío/lleno y ajustar sensibilidad según el manual. No puede medir a través de la lata metálica de un aerosol.
 
-El PWM mezcla rojo 255 y verde 65 para naranja; azul siempre 0. Ajustar la proporción visual si el LED real se percibe amarillo, sin cambiar el significado del estado. Durante el arranque queda apagado hasta estabilizar la primera lectura.
+El PWM usa rojo 255, verde 0 y azul 0 para nivel bajo; rojo 0, verde 255 y azul 0 para nivel suficiente. Durante el arranque queda apagado hasta estabilizar la primera lectura.
 
 ## Entorno local y carga
 
@@ -99,3 +99,11 @@ aws dynamodb query --table-name NOMBRE_TABLA_DE_LA_PILA --key-condition-expressi
 ```
 
 El CLI pagina automáticamente salvo que se cambien sus opciones. No confundir una página limitada con el resultado completo. Un filtro TTL debe aplicarse para reportes de uso; para auditoría de una ventana reciente conservar todas las filas relevantes. Sanitizar capturas y exportaciones antes de incorporarlas a `evidencias/practica4/`.
+
+## Intervalo de depuración y actualización de color
+
+El intervalo automático inicial y de recuperación ante un valor inválido es 5 s, medido entre inicios de dosis con `millis()`; no se añade una espera bloqueante. Requiere un nuevo flanco PIR, modo automático y motor libre. La voz conserva su prioridad y puede saltar ese intervalo. El calentamiento PIR sigue siendo 60 s.
+
+La configuración válida persistida en NVS y `desired.cooldownSeconds` conservan prioridad. En una placa ya configurada, solicitar «cambia el intervalo a cinco segundos» y consultar hasta confirmar `reported.cooldownSeconds=5`. No borrar NVS para cambiarlo.
+
+El contrato vigente usa `red` para nivel bajo. Actualizar conjuntamente firmware y Lambdas Alexa/almacenamiento antes de la prueba integrada: la versión anterior del almacenamiento no admite `red`. Los registros históricos se conservan con su color original. Los cambios locales no actualizan la placa ni AWS; verificar elegibilidad y consumo gratuitos antes de desplegar.

@@ -22,7 +22,8 @@ class Ambientador {
   LevelIndicator level;
   TelemetryQueue telemetry;
   const char* cycleOrigin = "edge";
-  uint32_t cooldownSeconds = 300;
+  static constexpr uint32_t kDefaultCooldownSeconds = 5;  // Depuración.
+  uint32_t cooldownSeconds = kDefaultCooldownSeconds;
   String topic;
   String lastActivation;
   String phase = "idle";

@@ -214,9 +214,9 @@ class SkillTests(unittest.TestCase):
         self.assertIn("60 segundos", self.speech(self.event("ConsultarIntervaloIntent")))
 
     def test_low_level_only_warns_and_voice_still_works(self):
-        self.document["state"]["reported"].update(levelReady=True, lowLevel=True, ledColor="orange")
+        self.document["state"]["reported"].update(levelReady=True, lowLevel=True, ledColor="red")
         self.assertIn("no bloquea", self.speech(self.event("ConsultarNivelIntent")))
-        self.assertIn("anaranjado", self.speech(self.event("ConsultarLedIntent")))
+        self.assertIn("rojo", self.speech(self.event("ConsultarLedIntent")))
         self.assertIn("Envié", self.speech(self.event("ActivarIntent")))
         self.shadow.update_thing_shadow.assert_called_once()
 

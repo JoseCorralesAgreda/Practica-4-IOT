@@ -30,8 +30,8 @@ void Ambientador::begin() {
     storageReady = preferences.begin("ambientador", false);
     lastActivation = preferences.getString("activation", "");
     automatic = preferences.getBool("automatic", false);
-    cooldownSeconds = preferences.getUInt("cooldown", 300);
-    if (cooldownSeconds < 5 || cooldownSeconds > 86400) cooldownSeconds = 300;
+    cooldownSeconds = preferences.getUInt("cooldown", kDefaultCooldownSeconds);
+    if (cooldownSeconds < 5 || cooldownSeconds > 86400) cooldownSeconds = kDefaultCooldownSeconds;
     telemetry.begin();
     servo.setPeriodHertz(50);
     servo.attach(SERVO_PIN, 500, 2400);

@@ -1,6 +1,6 @@
 # Ambientador inteligente — Práctica 4
 
-Extensión del proyecto de la Práctica 3: ESP32 DOIT DEVKIT V1, PIR HC-SR501 y servo SG90, con **XKC-Y23A-NPN** y **RGB de cátodo común**. El LED se muestra verde con líquido a la altura del sensor y anaranjado con nivel bajo. **El aviso nunca bloquea la dosificación automática ni por voz.**
+Extensión del proyecto de la Práctica 3: ESP32 DOIT DEVKIT V1, PIR HC-SR501 y servo SG90, con **XKC-Y23A-NPN** y **RGB de cátodo común**. El LED se muestra verde con líquido a la altura del sensor y rojo con nivel bajo. **El aviso nunca bloquea la dosificación automática ni por voz.**
 
 El sensor de líquido usa GPIO26 con **pull-up interno del ESP32 (`INPUT_PULLUP`)**, sin resistencia externa de señal. Se mantienen las resistencias del RGB. Ver conexiones y comprobaciones eléctricas en [configuración](docs/practica4/configuracion.md).
 
@@ -26,7 +26,7 @@ El [informe de la Práctica 3](docs/informe.md), sus guías y evidencias permane
 1. Vincular: «vincula mi ambientador con thing».
 2. Dosificar: «activa el ambientador»; ciclo 0° → 180° → 0°, 700 ms por fase.
 3. Control local: «activa el modo automático». Un nuevo flanco PIR dispara una dosis si el motor está libre y transcurrió el intervalo; no dosifica repetidamente por mantener el PIR alto.
-4. Configurar: «cambia el intervalo a trescientos segundos»; valores enteros de 5 a 86400 s. El valor inicial es 300 s.
+4. Configurar: «cambia el intervalo a cinco segundos»; valores enteros de 5 a 86400 s. El valor inicial de depuración es 5 s; un intervalo ya guardado en la placa o presente en `desired` tiene prioridad. Para ajustarlo en una placa existente, usar la orden anterior y consultar el intervalo aplicado.
 5. Consultar: «hay movimiento», «cuál es el nivel de fragancia», «de qué color está el led», «cuál es el estado del motor», «cuál es el modo actual» y «cuál es el intervalo».
 6. «Desactiva el modo automático» impide nuevos ciclos PIR y deja terminar el actual. La voz sigue permitida con motor libre y puede saltarse el intervalo automático.
 

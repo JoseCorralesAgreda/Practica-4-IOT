@@ -10,7 +10,7 @@ flowchart LR
   XKC[XKC-Y23A-NPN: nivel puntual] --> FIL[Filtrado 500 ms]
   FIL --> ESP
   ESP --> SERVO[SG90: pulsación del atomizador]
-  ESP --> LED[RGB cátodo común: verde / anaranjado]
+  ESP --> LED[RGB cátodo común: verde / rojo]
   NVS[(NVS: modo, intervalo, última orden)] <--> ESP
   ESP --> Q[Cola RAM: 32 registros]
   Q --> TLS[MQTT TLS: Shadow]
@@ -230,7 +230,7 @@ sequenceDiagram
   X->>F: Cambio de salida digital
   F->>F: Esperar estabilidad durante 500 ms
   alt Sin líquido a la altura del sensor
-    F->>L: PWM rojo 255, verde 65, azul 0
+    F->>L: PWM rojo 255, verde 0, azul 0
   else Con líquido
     F->>L: PWM rojo 0, verde 255, azul 0
   end
@@ -258,10 +258,10 @@ stateDiagram-v2
   state Indicador {
     [*] --> Apagado
     Apagado --> Verde: primera lectura suficiente estable
-    Apagado --> Anaranjado: primera lectura baja estable
-    Verde --> Anaranjado: nivel bajo estable 500 ms
-    Anaranjado --> Verde: nivel suficiente estable 500 ms
+    Apagado --> Rojo: primera lectura baja estable
+    Verde --> Rojo: nivel bajo estable 500 ms
+    Rojo --> Verde: nivel suficiente estable 500 ms
   }
 ```
 
-El modo, el motor y el indicador no se excluyen entre sí: puede dosificarse con LED anaranjado en cualquiera de los modos. Una pérdida de WiFi no cambia estas máquinas de estados.
+El modo, el motor y el indicador no se excluyen entre sí: puede dosificarse con LED rojo en cualquiera de los modos. Una pérdida de WiFi no cambia estas máquinas de estados.

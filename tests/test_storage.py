@@ -26,7 +26,7 @@ def valid_event():
             "automatic": True,
             "levelReady": True,
             "lowLevel": True,
-            "ledColor": "orange",
+            "ledColor": "red",
             "servoState": "idle",
             "servoAngle": 0,
             "cyclesSinceBoot": 3,
@@ -109,7 +109,7 @@ class StorageTests(unittest.TestCase):
             event={
                 "actuator": "rgb",
                 "from": "green",
-                "to": "orange",
+                "to": "red",
                 "origin": "voz",
             },
         )

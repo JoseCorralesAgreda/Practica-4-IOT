@@ -40,9 +40,9 @@ bool LevelIndicator::update(uint32_t now) {
   if (now - changedAt_ < kStableMs || (ready_ && low_ == raw_)) return false;
   low_ = raw_;
   ready_ = true;
-  // El verde reducido mezcla naranja, no amarillo; ajustar visualmente en montaje.
+  // Nivel bajo: solo rojo; nivel suficiente: solo verde.
   ledcWrite(kRedChannel, low_ ? 255 : 0);
-  ledcWrite(kGreenChannel, low_ ? 65 : 255);
+  ledcWrite(kGreenChannel, low_ ? 0 : 255);
   ledcWrite(kBlueChannel, 0);
   return true;
 }

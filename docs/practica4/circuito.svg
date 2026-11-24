@@ -79,5 +79,5 @@
   <text x="45" y="620" class="note">Todas las masas son comunes. No unir 5 V externos con USB sin gestión de alimentación.</text>
   <text x="45" y="643" class="note">Servo: desacoplo próximo 100 nF + 470 µF entre 5 V y GND; dimensionar fuente para la carga.</text>
   <text x="45" y="666" class="note">Sensor: comprobar OUT de 0 a 3.3 V; adaptar nivel si hay pull-up interno a 5 V. Recipiente no metálico.</text>
-  <text x="45" y="687" class="note">El nivel bajo solo cambia el RGB a anaranjado; no inhibe el servo. Montaje físico pendiente de validación.</text>
+  <text x="45" y="687" class="note">El nivel bajo solo cambia el RGB a rojo; no inhibe el servo. Montaje físico pendiente de validación.</text>
 </svg>

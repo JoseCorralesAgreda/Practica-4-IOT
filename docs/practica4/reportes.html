@@ -17,7 +17,7 @@
     .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; }
     .card { background: #f1f5f2; border-radius: 8px; padding: 18px; }
     .value { display: block; font-size: 2rem; font-weight: 700; margin: 6px 0; }
-    .low { background: #fff0dc; color: #7c4406; }
+    .low { background: #ffe5e5; color: #a01919; }
     .bars { display: flex; align-items: end; gap: 30px; height: 150px; padding: 12px; border-bottom: 1px solid #9cac9f; }
     .bar { background: #277262; color: white; text-align: center; width: 38%; min-width: 90px; padding-top: 8px; }
     .bar.voice { background: #596a8c; }
@@ -40,24 +40,24 @@
       <p class="eyebrow">Reporte 01 · Decidir cuándo reponer</p>
       <h2 id="nivel-title">Estado y avisos de nivel</h2>
       <div class="grid">
-        <article class="card low"><h3>Última lectura</h3><span class="value">Nivel bajo</span><p>LED anaranjado · reponer fragancia</p></article>
+        <article class="card low"><h3>Última lectura</h3><span class="value">Nivel bajo</span><p>LED rojo · reponer fragancia</p></article>
         <article class="card"><h3>Antigüedad</h3><span class="value">42 s</span><p>Dato reciente, no un porcentaje de volumen</p></article>
-        <article class="card"><h3>Descensos detectados hoy</h3><span class="value">2</span><p>Transiciones verde → anaranjado</p></article>
+        <article class="card"><h3>Descensos detectados hoy</h3><span class="value">2</span><p>Transiciones verde → rojo</p></article>
       </div>
       <h3>Cronología ilustrativa</h3>
       <div class="scroll"><table><thead><tr><th>Hora local</th><th>Evento</th><th>Interpretación</th></tr></thead><tbody>
-        <tr><td>09:10</td><td>Verde → anaranjado</td><td>Líquido por debajo de la altura del sensor</td></tr>
-        <tr><td>09:25</td><td>Anaranjado → verde</td><td>Volvió a detectarse líquido; posible reposición</td></tr>
-        <tr><td>16:40</td><td>Verde → anaranjado</td><td>Nuevo aviso; la dosificación sigue habilitada</td></tr>
+        <tr><td>09:10</td><td>Verde → rojo</td><td>Líquido por debajo de la altura del sensor</td></tr>
+        <tr><td>09:25</td><td>Rojo → verde</td><td>Volvió a detectarse líquido; posible reposición</td></tr>
+        <tr><td>16:40</td><td>Verde → rojo</td><td>Nuevo aviso; la dosificación sigue habilitada</td></tr>
       </tbody></table></div>
-      <p class="muted">Origen: Query por Thing y rango de recordKey; eventos RGB. Último registro válido con clockKnown y levelReady. Excluir TTL vencido; si la antigüedad supera 180 s mostrar “Sin datos recientes”. Un arranque apagado → anaranjado se presenta aparte.</p>
+      <p class="muted">Origen: Query por Thing y rango de recordKey; eventos RGB. Último registro válido con clockKnown y levelReady. Excluir TTL vencido; si la antigüedad supera 180 s mostrar “Sin datos recientes”. Un arranque apagado → rojo se presenta aparte.</p>
     </section>
     <section aria-labelledby="uso-title">
       <p class="eyebrow">Reporte 02 · Revisar el intervalo automático</p>
       <h2 id="uso-title">Ciclos terminados por origen</h2>
       <div class="grid">
         <article class="card"><h3>Total ilustrativo</h3><span class="value">12</span><p>Ciclos completados; no mililitros consumidos</p></article>
-        <article class="card"><h3>Intervalo reportado</h3><span class="value">300 s</span><p>Configuración aplicada más reciente</p></article>
+        <article class="card"><h3>Intervalo reportado</h3><span class="value">5 s</span><p>Configuración aplicada más reciente</p></article>
         <article class="card"><h3>Modo reportado</h3><span class="value">Automático</span><p>La voz también puede iniciar ciclos</p></article>
       </div>
       <div class="bars" role="img" aria-label="Datos ficticios: 8 ciclos Edge y 4 ciclos por voz"><div class="bar" style="height: 112px">8 · Edge</div><div class="bar voice" style="height: 56px">4 · Voz</div></div>

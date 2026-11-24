@@ -1,10 +1,10 @@
 {
   "state": {
-    "desired": {"automatic": true, "cooldownSeconds": 300, "activationId": "ejemplo-orden-1"},
+    "desired": {"automatic": true, "cooldownSeconds": 5, "activationId": "ejemplo-orden-1"},
     "reported": {
-      "automatic": true, "cooldownSeconds": 300, "activationId": "ejemplo-orden-1",
+      "automatic": true, "cooldownSeconds": 5, "activationId": "ejemplo-orden-1",
       "presence": false, "pirReady": true, "levelReady": true, "lowLevel": true,
-      "ledColor": "orange", "servoState": "idle", "servoAngle": 0,
+      "ledColor": "red", "servoState": "idle", "servoAngle": 0,
       "cyclesSinceBoot": 1, "uptimeSeconds": 120,
       "schemaVersion": 4, "messageId": "p4-aaaaaaaaaaaaaaaaaaaaaaaa-1",
       "sampledAt": 1800000000, "observedAtMs": 1800000000000,

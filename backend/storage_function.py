@@ -14,7 +14,7 @@ from botocore.exceptions import ClientError
 THING_PATTERN = re.compile(r"[A-Za-z0-9:_-]{1,128}")
 MESSAGE_PATTERN = re.compile(r"p4-[a-f0-9]{24}-[1-9][0-9]{0,9}")
 SERVO_STATES = {"idle", "pressing", "returning"}
-COLORS = {"off", "green", "orange"}
+COLORS = {"off", "green", "red"}
 _table = None
 
 
@@ -70,7 +70,7 @@ def validate_record(event, stored_at_ms):
     if not isinstance(color, str) or color not in COLORS:
         raise ValueError("ledColor")
     expected_color = (
-        "off" if not reported["levelReady"] else ("orange" if reported["lowLevel"] else "green")
+        "off" if not reported["levelReady"] else ("red" if reported["lowLevel"] else "green")
     )
     if color != expected_color:
         raise ValueError("ledColor inconsistent")
@@ -87,7 +87,7 @@ def validate_record(event, stored_at_ms):
         actuator = transition.get("actuator")
         valid_transitions = {
             "servo": {("idle", "pressing"), ("pressing", "returning"), ("returning", "idle")},
-            "rgb": {("off", "green"), ("off", "orange"), ("green", "orange"), ("orange", "green")},
+            "rgb": {("off", "green"), ("off", "red"), ("green", "red"), ("red", "green")},
         }
         if not isinstance(actuator, str) or actuator not in valid_transitions:
             raise ValueError("actuator")

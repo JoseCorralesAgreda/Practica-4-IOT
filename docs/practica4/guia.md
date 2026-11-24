@@ -15,7 +15,7 @@ El XKC-Y23A-NPN confirmado reemplaza la referencia inicial al XKC-Y25. Requiere 
 | Regla | Dónde y por qué | Convivencia con voz |
 |---|---|---|
 | Un nuevo flanco PIR activa un ciclo si `automatic=true`, el motor está libre y pasó `cooldownSeconds` desde el inicio de la última dosis | Edge: datos locales, respuesta inmediata y operación sin Internet | La voz puede dosificar en cualquier modo con motor libre; cada dosis reinicia la espera automática |
-| Nivel estable durante 500 ms: anaranjado si falta líquido, verde si hay líquido | Edge: aviso local independiente de red; evita cambios por fluctuaciones breves | No hay comando de color; el LED siempre deriva del sensor. El nivel bajo no bloquea ninguna dosis |
+| Nivel estable durante 500 ms: rojo si falta líquido, verde si hay líquido | Edge: aviso local independiente de red; evita cambios por fluctuaciones breves | No hay comando de color; el LED siempre deriva del sensor. El nivel bajo no bloquea ninguna dosis |
 | Presionar 700 ms y retornar 700 ms | Edge: secuencia mecánica sin `delay` por fase | Nunca se superponen ciclos; apagar automático deja terminar el actual |
 | Validar y almacenar lecturas/eventos | Lambda de almacenamiento: responsabilidad persistente, permisos `PutItem` | No controla actuadores ni escribe `desired` |
 

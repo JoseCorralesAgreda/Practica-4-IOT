@@ -214,7 +214,7 @@ class AmbientadorSkill:
                     text
                     + " Es una detección puntual, no un porcentaje. El aviso no bloquea las dosis."
                 )
-            colors = {"green": "verde", "orange": "anaranjado"}
+            colors = {"green": "verde", "red": "rojo"}
             color = colors.get(reported.get("ledColor"))
             if color is None:
                 return self.respond("Todavía no tengo un color confirmado del led.")

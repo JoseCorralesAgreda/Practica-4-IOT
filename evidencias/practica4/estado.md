@@ -29,7 +29,7 @@ Se validó la plantilla generada con cfn-lint, sin desplegar recursos. El códig
 | Lambda Alexa remota | Código actualizado y SHA-256 verificado; entorno/disparador conservados; inicio y consulta sin vínculo comprobados por invocación directa |
 | Modelo Alexa remoto | JSON local preparado; importación/build/test en consola pendientes |
 | ESP32 físico | Firmware compilado, no cargado en esta sesión |
-| Sensor/recipiente/RGB | GPIO, polaridad, material del depósito, compatibilidad con fragancia y tono naranja pendientes de prueba |
+| Sensor/recipiente/RGB | GPIO, polaridad, material del depósito, compatibilidad con fragancia y color rojo pendientes de prueba |
 | Métricas de integración | Integridad, latencia real, reconexión, control Edge y gasto real pendientes de M01–M06 |
 
 No se publicaron secretos, no se hizo push ni se generó el informe final. La eliminación preexistente de `Práctica_3.md` se dejó intacta; el informe y las evidencias de la Práctica 3 no se sobrescribieron.
@@ -46,3 +46,7 @@ El 23 de noviembre se repitieron satisfactoriamente los 43 tests, la compilació
 | M04 | Pendiente | — | — |
 | M05 | Pendiente | — | — |
 | M06 | Pendiente | — | — |
+
+## Ajuste local de LED e intervalo de debug
+
+Nivel bajo cambiado a rojo (`red`) e intervalo inicial a 5 s. Verificados: 43 tests Python, Ruff y compilación PlatformIO correctos. Pendientes: carga de placa, actualización de Lambdas y pruebas integradas de color/intervalo. La configuración persistida o desired anterior requiere solicitar 5 s por Alexa y confirmar reported; no se modificaron recursos AWS en este ajuste.

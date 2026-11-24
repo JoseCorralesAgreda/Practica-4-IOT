@@ -7,11 +7,11 @@
 | Campo | Tipo y dominio | Dirección / significado |
 |---|---|---|
 | `automatic` | boolean | desired/reported; false manual, true automático; valor inicial false, luego recuperado de NVS |
-| `cooldownSeconds` | entero 5–86400 | desired/reported; inicial 300; mínimo entre inicios automáticos desde la última dosis, incluso si fue por voz |
+| `cooldownSeconds` | entero 5–86400 | desired/reported; inicial 5 s para depuración; mínimo entre inicios automáticos desde la última dosis, incluso si fue por voz |
 | `activationId` | string 1–128 al solicitar, vacío antes de primera orden | desired/reported; identificador Alexa procesado, guardado antes de mover |
 | `presence`, `pirReady` | boolean | reported; PIR observado y estabilización completada |
 | `lowLevel`, `levelReady` | boolean | reported; salida filtrada interpretada y primera lectura disponible |
-| `ledColor` | `off`, `green`, `orange` | reported; apagado solo antes de primera lectura; después deriva del nivel |
+| `ledColor` | `off`, `green`, `red` | reported; apagado solo antes de primera lectura; después deriva del nivel |
 | `servoState` | `idle`, `pressing`, `returning` | reported; fase ordenada, no posición medida |
 | `servoAngle` | entero 0 o 180 | reported; 180 durante pressing, 0 en otras fases |
 | `cyclesSinceBoot` | entero unsigned 32 bits | reported; ciclos terminados desde este arranque |
@@ -62,7 +62,7 @@ Cada fila contiene los campos de reported indicados, excepto activationId, adem�
 | Datos de un Thing entre dos instantes | PK exacta y SK BETWEEN `inicioMs#` y `finMs#~`; paginar con LastEvaluatedKey | Cronología de nivel y eventos |
 | Última observación conocida del Thing | PK exacta, SK mayor a `0000000000000#~`, ScanIndexForward=false, revisar TTL y antigüedad | Reposición; mostrar sin datos si es antigua |
 | Dosis finalizadas del día por origen | Query del intervalo; filtrar `event.actuator=servo`, `event.to=idle`; agrupar origin | Ajustar intervalo y revisar uso manual |
-| Cambios a nivel bajo | Query del intervalo; `event.actuator=rgb`, `event.to=orange`; separar transición desde off (arranque) | Detectar necesidad de reposición |
+| Cambios a nivel bajo | Query del intervalo; `event.actuator=rgb`, `event.to=red`; separar transición desde off (arranque) | Detectar necesidad de reposición |
 | Auditoría de pruebas | Query del intervalo; comparar IDs y latencia con log serial de la misma ventana | Integridad y retrasos |
 | Eventos capturados antes de sincronizar reloj | PK exacta y begins_with(SK, `0000000000000#`) | Auditoría aparte, sin fecha inventada |
 

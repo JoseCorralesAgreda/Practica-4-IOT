@@ -10,7 +10,7 @@ class LevelIndicator {
   bool update(uint32_t now);  // true solo cuando cambia el estado filtrado.
   bool ready() const { return ready_; }
   bool low() const { return low_; }
-  const char* color() const { return !ready_ ? "off" : low_ ? "orange" : "green"; }
+  const char* color() const { return !ready_ ? "off" : low_ ? "red" : "green"; }
 
  private:
   bool raw_ = false;
