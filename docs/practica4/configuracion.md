@@ -16,7 +16,7 @@ No unir 5 V externos con 5 V USB sin un circuito de alimentación adecuado. No c
 
 La [ficha del fabricante](https://www.xkc-sensor.com/detail/1433.html) identifica la variante NPN, detección a través de recipientes no metálicos y respuesta nominal de 500 ms. El montaje propuesto usa 5 V para la alimentación del sensor y el pull-up interno del ESP32 hacia 3.3 V, habilitado por `pinMode(kLevelPin, INPUT_PULLUP)`. No montar la resistencia externa de 10 kΩ ni un puente de OUT a 3V3. Las tres resistencias de 330 Ω del RGB sí se mantienen. No asumir colores de cables; comprobar el diagrama entregado con el ejemplar para identificar VCC, GND y salida.
 
-Espressif documenta un pull-up interno de aproximadamente 45 kΩ ([GPIO Arduino-ESP32](https://docs.espressif.com/projects/arduino-esp32/en/latest/api/gpio.html)). Es una polarización de entrada, no un adaptador de 5 V a 3.3 V. Su activación ocurre en `begin()`; no asumir señal definida durante reset. Usar cable de señal corto y comprobar estabilidad con el servo funcionando. Con sensor desconectado, HIGH se interpreta como nivel bajo después del filtro de 500 ms: no se diagnostica desconexión. La estabilidad con este montaje sigue pendiente de M01/M03/M05.
+Espressif documenta un pull-up interno de aproximadamente 45 kΩ ([GPIO Arduino-ESP32](https://docs.espressif.com/projects/arduino-esp32/en/latest/api/gpio.html)). Es una polarización de entrada, no un adaptador de 5 V a 3.3 V. Su activación ocurre en `begin()`; no asumir señal definida durante reset. El video EV11 documenta la estabilidad del sensor con el servo funcionando. Con sensor desconectado, HIGH se interpreta como nivel bajo después del filtro de 500 ms.
 
 Fijar el sensor externamente a la altura mínima deseada en un recipiente no metálico; probar con la fragancia real. Este umbral es **físico**, no un número de porcentaje que pueda cambiarse por voz. El parámetro de negocio configurable por voz es el intervalo de dosificación. Ensayar vacío/lleno y ajustar sensibilidad según el manual. No puede medir a través de la lata metálica de un aerosol.
 
@@ -34,7 +34,7 @@ Para cargar, una vez verificado el montaje y el puerto de la placa:
 ./.venv/Scripts/python.exe -m platformio device monitor -d firmware
 ```
 
-Estas acciones no se han ejecutado: la sesión solo compiló. El monitor registra IDs, fases y GPIO; no imprime secretos. Los binarios incluyen credenciales y deben permanecer fuera de Git.
+Las acciones se documentan en el informe y en las evidencias EV01–EV12. El monitor registra IDs, fases y GPIO; no imprime secretos. Los binarios incluyen credenciales y deben permanecer fuera de Git.
 
 ## AWS: preparación y condición previa
 

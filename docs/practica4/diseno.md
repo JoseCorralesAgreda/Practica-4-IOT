@@ -1,6 +1,6 @@
 # Diseño del sistema
 
-Diagramas de la versión implementada; el montaje y las mediciones físicas siguen pendientes. Los contratos y patrones de acceso están en [contratos](contratos.md), y los pines en [configuración](configuracion.md).
+Diagramas de la versión implementada; el montaje y las pruebas físicas están respaldados por las fotografías y videos de `evidencias/practica4`. Los contratos y patrones de acceso están en [contratos](contratos.md), y los pines en [configuración](configuracion.md).
 
 ## Bloques del objeto
 

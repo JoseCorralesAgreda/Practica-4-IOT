@@ -8,18 +8,21 @@ Alexa conserva la vinculación de cada usuario con su Thing. Todos los comandos 
 
 ## Documentación vigente
 
-- [Guía de estudio y decisiones](docs/practica4/guia.md): recorrido del código, alcance, reglas y limitaciones.
+- [Informe técnico de la Práctica 4](docs/practica4/informe.md): desarrollo según rúbrica, resultados, circuito, diagramas, anexos y videos de evidencia.
+- [Guía de ejecución de pruebas](docs/practica4/guia-ejecucion-pruebas.md) y [guía de defensa](docs/practica4/defensa.md).
+
+- [Guía de estudio y decisiones](docs/practica4/guia.md): recorrido del código, alcance y reglas.
 - [Diseño y diagramas](docs/practica4/diseno.md): bloques, circuito, clases, arquitectura, estados y secuencias.
 - [Contratos de datos y Alexa](docs/practica4/contratos.md): Shadow, regla SQL, histórico, intents y consultas.
 - [Montaje y despliegue](docs/practica4/configuracion.md): conexiones, preparación local y configuración AWS/Alexa.
 - [Costos y seguridad](docs/practica4/costos-seguridad.md): consumo reproducible y condición de capa gratuita.
 - [Pruebas fundamentales y trazabilidad](docs/practica4/pruebas.md): seis pruebas manuales integradas, métricas y rúbrica.
 - [Mockups de reportes](docs/practica4/reportes.html): abrir en un navegador; datos ficticios y sin conexión a AWS.
-- [Estado verificable](evidencias/practica4/estado.md): comprobaciones locales y pendientes reales.
+- [Estado verificable](evidencias/practica4/estado.md): comprobaciones y resultados de la práctica.
 
-El [informe de la Práctica 3](docs/informe.md), sus guías y evidencias permanecen como antecedentes; no describen la versión actual. **Todavía no se genera el informe final de la Práctica 4.**
+El informe de la Práctica 3 y sus guías constan en el historial Git (por ejemplo, `git show HEAD:docs/informe.md`). La Práctica 4 dispone de un informe técnico completo, con sus pruebas manuales y evidencias audiovisuales anexas.
 
-**Estado AWS al 23 de noviembre de 2026:** histórico desplegado y regla habilitada en `us-east-2`; Lambda Alexa actualizada. Recorrido Shadow → IoT Rule → Lambda → DynamoDB verificado con datos sintéticos separados. Falta cargar la placa, actualizar el modelo en Alexa Developer Console y ejecutar las pruebas físicas. Consultar [evidencia y pendientes](evidencias/practica4/aws-integracion-2026-11-23.md).
+**Registro AWS y evidencias del 24 de noviembre de 2026:** histórico desplegado, regla habilitada en `us-east-2`, Lambda Alexa actualizada, fotos físicas, nueve capturas Alexa, serial, CSV y dos videos. Consultar el [estado consolidado](evidencias/practica4/estado.md) y el [informe final](docs/practica4/informe.md).
 
 ## Uso
 

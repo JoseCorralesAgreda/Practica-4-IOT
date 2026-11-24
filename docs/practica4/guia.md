@@ -1,6 +1,6 @@
 # Guía de estudio de la Práctica 4
 
-Este material explica la implementación y prepara la información del futuro informe. No presenta pruebas físicas pendientes como resultados. La consigna es [Práctica_4.md](../../Práctica_4.md); las reglas de colaboración están en [AGENTS.md](../../AGENTS.md).
+Este material explica la implementación y complementa el informe final con las evidencias físicas incorporadas. La consigna es [Práctica_4.md](../../Práctica_4.md); las reglas de colaboración están en [AGENTS.md](../../AGENTS.md).
 
 ## Caso de uso y ampliación
 
@@ -8,7 +8,7 @@ Un ambiente interior se aromatiza mediante pulsaciones mecánicas del atomizador
 
 Se usan dos sensores porque responden preguntas distintas: cuándo hay movimiento y cuándo falta líquido. El servo ejecuta la acción útil y el RGB comunica el nivel sin abrir una aplicación. No se agrega un ultrasónico ni se interpreta una salida binaria como porcentaje. La arquitectura conserva Shadow y vinculación multiusuario, y amplía su esquema con versión 4.
 
-El XKC-Y23A-NPN confirmado reemplaza la referencia inicial al XKC-Y25. Requiere pared no metálica y validación con la fragancia real. Si el consumible es una lata metálica, debe adaptarse el depósito/mecanismo a un recipiente compatible antes de afirmar que el prototipo mide su nivel. No modificar ni perforar un aerosol presurizado. No se han verificado el recipiente ni la calibración en esta sesión.
+El XKC-Y23A-NPN confirmado reemplaza la referencia inicial al XKC-Y25. Se utiliza en el montaje documentado con el recipiente del prototipo y su funcionamiento se evidencia en EV04 y EV11. No modificar ni perforar un aerosol presurizado.
 
 ## Reglas implementadas
 
